@@ -1,7 +1,7 @@
 package com.dbojanek.quotations.controller;
 
-import com.dbojanek.quotations.model.Quote;
-import com.dbojanek.quotations.service.QuoteServiceImpl;
+import com.dbojanek.quotations.model.dto.QuoteDTO;
+import com.dbojanek.quotations.service.QuoteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,68 +14,66 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.security.InvalidParameterException;
-import java.util.Map;
+import java.util.List;
 
 @RestController
 @RequestMapping("/quote")
 public class QuoteController {
 
+    private final QuoteService quoteService;
+
     @Autowired
-    private QuoteServiceImpl quoteService;
+    public QuoteController(QuoteService quoteService) {
+        this.quoteService = quoteService;
+    }
 
     @GetMapping("")
-    public ResponseEntity<Map<Long, Quote>> getQuotes() {
-        Map<Long, Quote> quotes = quoteService.getQuotes();
+    public ResponseEntity<List<QuoteDTO>> getQuotes() {
+        List<QuoteDTO> quotes = quoteService.getQuotes();
         return new ResponseEntity<>(quotes, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Quote> getQuote(@PathVariable String id) {
+    public ResponseEntity<QuoteDTO> getQuote(@PathVariable Long id) {
         try {
-            Long quoteId = Long.parseLong(id);
-            Quote quote = quoteService.getQuote(quoteId);
+            QuoteDTO quote = quoteService.getQuote(id);
             return new ResponseEntity<>(quote, HttpStatus.OK);
-        } catch (NumberFormatException numberFormatException) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        } catch (IllegalArgumentException iae) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
     }
 
     @PostMapping(value = "", consumes = "application/json")
-    public ResponseEntity<String> addQuote(@RequestBody Quote quote) {
+    public ResponseEntity<QuoteDTO> addQuote(@RequestBody QuoteDTO quote) {
         try {
-            quoteService.addQuote(quote);
+            QuoteDTO quoteDTO = quoteService.addQuote(quote);
 
-            return new ResponseEntity<>("Quote added.", HttpStatus.CREATED);
-        } catch (InvalidParameterException ipe) {
-            return new ResponseEntity<>("Invalid parameters provided.", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(quoteDTO, HttpStatus.CREATED);
+        } catch (IllegalArgumentException iae) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> removeQuote(@PathVariable String id) {
+    public ResponseEntity<String> removeQuote(@PathVariable Long id) {
         try {
-            Long quoteId = Long.parseLong(id);
-            quoteService.removeQuote(quoteId);
+            quoteService.removeQuote(id);
 
             return new ResponseEntity<>("Quote removed.", HttpStatus.OK);
-        } catch (NumberFormatException numberFormatException) {
-            return new ResponseEntity<>("Invalid id value.", HttpStatus.BAD_REQUEST);
+        } catch (IllegalArgumentException iae) {
+            return new ResponseEntity<>("Invalid id value.", HttpStatus.NOT_FOUND);
         }
     }
 
     @PutMapping(value = "/{id}", consumes = "application/json")
-    public ResponseEntity<String> updateQuote(@PathVariable String id, @RequestBody Quote quote) {
+    public ResponseEntity<String> updateQuote(@PathVariable Long id, @RequestBody QuoteDTO quoteDTO) {
         try {
-            Long quoteId = Long.parseLong(id);
-            Quote updateQuote = quoteService.updateQuote(quoteId, quote);
+            QuoteDTO updatedQuote = quoteService.updateQuote(id, quoteDTO);
 
-            return updateQuote != null ? new ResponseEntity<>("Quote updated", HttpStatus.OK) :
-                    new ResponseEntity<>("Quote for given id was not found.", HttpStatus.BAD_REQUEST);
-        } catch (NumberFormatException numberFormatException) {
-            return new ResponseEntity<>("Invalid id value.", HttpStatus.BAD_REQUEST);
-        } catch (InvalidParameterException ipe) {
-            return new ResponseEntity<>("Must provide at least one parameter for update", HttpStatus.BAD_REQUEST);
+            return updatedQuote != null ? new ResponseEntity<>("Quote updated", HttpStatus.OK) :
+                    new ResponseEntity<>("Quote for given id was not found.", HttpStatus.NOT_FOUND);
+        } catch (IllegalArgumentException iae) {
+            return new ResponseEntity<>("Must provide all parameters.", HttpStatus.BAD_REQUEST);
         }
     }
 }

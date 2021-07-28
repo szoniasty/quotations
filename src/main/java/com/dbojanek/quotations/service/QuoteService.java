@@ -1,17 +1,17 @@
 package com.dbojanek.quotations.service;
 
-import com.dbojanek.quotations.model.Quote;
+import com.dbojanek.quotations.model.dto.QuoteDTO;
 
-import java.util.Map;
+import java.util.List;
 
 public interface QuoteService {
-    Map<Long, Quote> getQuotes();
+    List<QuoteDTO> getQuotes();
 
-    Quote getQuote(Long id);
+    QuoteDTO getQuote(Long id);
 
-    Quote addQuote(Quote quote);
+    QuoteDTO addQuote(QuoteDTO quoteDTO);
 
     void removeQuote(Long id);
 
-    Quote updateQuote(Long id, Quote quote);
+    QuoteDTO updateQuote(Long id, QuoteDTO quoteDTO);
 }
