@@ -24,10 +24,8 @@ curl --location --request POST 'http://localhost:8080/quote' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "quote": "text quoty",
-    "author": {
-        "name": "Ferdynand",
-        "surname": "Najlepszy"
-    }
+    "authorName": "Janek",
+    "authorSurname": "Kowalczykiewski"
 }'
 ```
 
@@ -46,11 +44,11 @@ Update existing quote: `http://localhost:8080/quote/{id}`
 
 Curl example: 
 ```
-curl --location --request PUT 'http://localhost:8080/quote/4' \
+curl --location --request PUT 'http://localhost:8080/quote/3' \
 --header 'Content-Type: application/json' \
 --data-raw '{
-    "author": {
-        "surname": "NewSurname"
-    }
+    "quote": "Jakis cytat",
+    "authorName": "Adam",
+    "authorSurname": "Nowak"
 }'
 ```
