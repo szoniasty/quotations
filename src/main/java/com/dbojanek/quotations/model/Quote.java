@@ -1,12 +1,18 @@
 package com.dbojanek.quotations.model;
 
 public class Quote {
+    private final Long id;
     private String quote;
-    private Author author;
+    private final Author author;
 
-    public Quote(String quote, Author author) {
+    public Quote(Long id, String quote, Author author) {
+        this.id = id;
         this.quote = quote;
         this.author = author;
+    }
+
+    public long getId() {
+        return id;
     }
 
     public String getQuote() {
@@ -19,9 +25,5 @@ public class Quote {
 
     public void setQuote(String quote) {
         this.quote = quote;
-    }
-
-    public void setAuthor(Author author) {
-        this.author = author;
     }
 }
